@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SushijaRoll - Доставка суші</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #e74c3c; --primary-dark: #c0392b; --secondary: #2c3e50;
+            --accent: #f39c12; --light: #ecf0f1; --dark: #1a1a2e; --success: #27ae60;
+            --white: #ffffff; --gray-100: #f8f9fa; --gray-200: #e9ecef;
+            --gray-300: #dee2e6; --gray-600: #6c757d;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+        }
+        body { font-family: 'DM Sans', sans-serif; background-color: var(--gray-100); color: var(--secondary); line-height: 1.6; }
+        h1, h2, h3, h4 { font-family: 'Playfair Display', serif; }
+        .header { background: var(--white); box-shadow: var(--shadow); position: sticky; top: 0; z-index: 1000; }
+        .header-container { max-width: 1400px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 0.5rem; }
+        .nav { display: flex; gap: 2rem; align-items: center; }
+        .nav-link { text-decoration: none; color: var(--secondary); font-weight: 500; transition: var(--transition); cursor: pointer; }
+        .nav-link:hover { color: var(--primary); }
+        .cart-btn { background: var(--primary); color: var(--white); border: none; padding: 0.75rem 1.5rem; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-weight: 600; transition: var(--transition); }
+        .cart-btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .cart-count { background: var(--white); color: var(--primary); border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+        .hero { background: linear-gradient(135deg, var(--dark) 0%, var(--secondary) 100%); color: var(--white); padding: 6rem 2rem; text-align: center; position: relative; overflow: hidden; }
+        .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=1600') center/cover; opacity: 0.2; }
+        .hero-content { position: relative; max-width: 800px; margin: 0 auto; }
+        .hero h1 { font-size: 3.5rem; margin-bottom: 1.5rem; line-height: 1.2; }
+        .hero p { font-size: 1.25rem; opacity: 0.9; margin-bottom: 2rem; }
+        .hero-btn { background: var(--primary); color: var(--white); border: none; padding: 1rem 2.5rem; font-size: 1.1rem; border-radius: 50px; cursor: pointer; transition: var(--transition); font-weight: 600; }
+        .hero-btn:hover { background: var(--accent); transform: scale(1.05); }
+        .main-container { max-width: 1400px; margin: 0 auto; padding: 3rem 2rem; }
+        .categories-section { margin-bottom: 4rem; }
+        .section-title { font-size: 2.5rem; margin-bottom: 2rem; color: var(--secondary); text-align: center; }
+        .categories-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; }
+        .category-card { background: var(--white); border-radius: 20px; overflow: hidden; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow); }
+        .category-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); }
+        .category-card.active { border: 3px solid var(--primary); }
+        .category-img { width: 100%; height: 140px; object-fit: cover; }
+        .category-name { padding: 1rem; text-align: center; font-weight: 600; font-size: 1.1rem; }
+        .products-section { margin-bottom: 4rem; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
+        .product-card { background: var(--white); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow); transition: var(--transition); }
+        .product-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        .product-img { width: 100%; height: 200px; object-fit: cover; }
+        .product-info { padding: 1.5rem; }
+        .product-name { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--secondary); }
+        .product-desc { color: var(--gray-600); font-size: 0.9rem; margin-bottom: 1rem; min-height: 40px; }
+        .product-meta { display: flex; justify-content: space-between; align-items: center; }
+        .product-price { font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+        .product-weight { color: var(--gray-600); font-size: 0.85rem; }
+        .add-btn { background: var(--primary); color: var(--white); border: none; padding: 0.75rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 600; transition: var(--transition); }
+        .add-btn:hover { background: var(--primary-dark); }
+        .popular-badge { background: var(--accent); color: var(--white); padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.75rem; font-weight: 600; position: absolute; top: 1rem; right: 1rem; }
+        .product-card-wrapper { position: relative; }
+        .cart-sidebar { position: fixed; top: 0; right: -450px; width: 450px; height: 100vh; background: var(--white); box-shadow: -5px 0 30px rgba(0, 0, 0, 0.2); transition: var(--transition); z-index: 2000; display: flex; flex-direction: column; }
+        .cart-sidebar.open { right: 0; }
+        .cart-header { padding: 1.5rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
+        .cart-header h2 { font-size: 1.5rem; }
+        .close-cart { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray-600); }
+        .cart-items { flex: 1; overflow-y: auto; padding: 1rem; }
+        .cart-item { display: flex; gap: 1rem; padding: 1rem; border-bottom: 1px solid var(--gray-200); }
+        .cart-item-img { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; }
+        .cart-item-info { flex: 1; }
+        .cart-item-name { font-weight: 600; margin-bottom: 0.25rem; }
+        .cart-item-price { color: var(--primary); font-weight: 600; }
+        .quantity-controls { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+        .qty-btn { background: var(--gray-200); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
+        .qty-btn:hover { background: var(--gray-300); }
+        .remove-btn { background: none; border: none; color: var(--gray-600); cursor: pointer; margin-left: auto; }
+        .remove-btn:hover { color: var(--primary); }
+        .cart-footer { padding: 1.5rem; border-top: 1px solid var(--gray-200); }
+        .cart-total { display: flex; justify-content: space-between; font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; }
+        .checkout-btn { width: 100%; background: var(--success); color: var(--white); border: none; padding: 1rem; font-size: 1.1rem; border-radius: 10px; cursor: pointer; font-weight: 600; transition: var(--transition); }
+        .checkout-btn:hover { background: #219a52; }
+        .cart-empty { text-align: center; padding: 3rem; color: var(--gray-600); }
+        .cart-empty-icon { font-size: 4rem; margin-bottom: 1rem; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1500; opacity: 0; visibility: hidden; transition: var(--transition); }
+        .overlay.visible { opacity: 1; visibility: visible; }
+        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background: var(--white); padding: 2.5rem; border-radius: 20px; z-index: 2000; width: 90%; max-width: 400px; opacity: 0; visibility: hidden; transition: var(--transition); }
+        .modal.open { opacity: 1; visibility: visible; transform: translate(-50%, -50%) scale(1); }
+        .modal h2 { text-align: center; margin-bottom: 1.5rem; color: var(--secondary); }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .form-group input { width: 100%; padding: 0.875rem; border: 2px solid var(--gray-200); border-radius: 10px; font-size: 1rem; transition: var(--transition); }
+        .form-group input:focus { outline: none; border-color: var(--primary); }
+        .submit-btn { width: 100%; background: var(--primary); color: var(--white); border: none; padding: 1rem; font-size: 1rem; border-radius: 10px; cursor: pointer; font-weight: 600; margin-top: 0.5rem; transition: var(--transition); }
+        .submit-btn:hover { background: var(--primary-dark); }
+        .auth-switch { text-align: center; margin-top: 1rem; color: var(--gray-600); }
+        .auth-switch a { color: var(--primary); cursor: pointer; font-weight: 600; }
+        .close-modal { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray-600); }
+        .user-menu { position: relative; }
+        .user-btn { background: var(--secondary); color: var(--white); border: none; padding: 0.75rem 1.25rem; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-weight: 500; }
+        .user-dropdown { position: absolute; top: 100%; right: 0; background: var(--white); border-radius: 10px; box-shadow: var(--shadow-lg); padding: 0.5rem; min-width: 180px; opacity: 0; visibility: hidden; transform: translateY(10px); transition: var(--transition); }
+        .user-dropdown.open { opacity: 1; visibility: visible; transform: translateY(5px); }
+        .dropdown-item { display: block; padding: 0.75rem 1rem; color: var(--secondary); text-decoration: none; border-radius: 8px; cursor: pointer; transition: var(--transition); }
+        .dropdown-item:hover { background: var(--gray-100); }
+        .dropdown-item.logout { color: var(--primary); }
+        .profile-section { background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); margin-bottom: 2rem; }
+        .profile-header { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; }
+        .profile-avatar { width: 80px; height: 80px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--white); font-size: 2rem; font-weight: 700; }
+        .profile-info h2 { margin-bottom: 0.25rem; }
+        .profile-info p { color: var(--gray-600); }
+        .orders-list { display: flex; flex-direction: column; gap: 1rem; }
+        .order-card { background: var(--gray-100); border-radius: 15px; padding: 1.5rem; }
+        .order-header { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+        .order-id { font-weight: 600; }
+        .order-status { padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem; font-weight: 600; }
+        .order-status.pending { background: var(--accent); color: var(--white); }
+        .order-status.confirmed { background: var(--success); color: var(--white); }
+        .order-items { margin-bottom: 1rem; }
+        .order-item-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--gray-200); }
+        .order-total { display: flex; justify-content: space-between; font-weight: 700; font-size: 1.1rem; }
+        .footer { background: var(--dark); color: var(--white); padding: 3rem 2rem; margin-top: 4rem; }
+        .footer-container { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
+        .footer-section h3 { margin-bottom: 1.5rem; font-size: 1.25rem; }
+        .footer-section p, .footer-section a { color: rgba(255, 255, 255, 0.7); text-decoration: none; display: block; margin-bottom: 0.75rem; transition: var(--transition); }
+        .footer-section a:hover { color: var(--white); }
+        .footer-bottom { max-width: 1400px; margin: 0 auto; padding-top: 2rem; margin-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1); text-align: center; color: rgba(255, 255, 255, 0.5); }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--success); color: var(--white); padding: 1rem 1.5rem; border-radius: 10px; box-shadow: var(--shadow-lg); transform: translateX(150%); transition: var(--transition); z-index: 3000; }
+        .toast.show { transform: translateX(0); }
+        .toast.error { background: var(--primary); }
+        @media (max-width: 768px) {
+            .header-container { flex-wrap: wrap; gap: 1rem; }
+            .nav { order: 3; width: 100%; justify-content: center; gap: 1rem; }
+            .hero h1 { font-size: 2.5rem; }
+            .cart-sidebar { width: 100%; right: -100%; }
+            .products-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+        }
+        .page { display: none; }
+        .page.active { display: block; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="#" class="logo" onclick="showPage('home')">🍣 SushijaRoll</a>
+            <nav class="nav">
+                <span class="nav-link" onclick="showPage('home')">Головна</span>
+                <span class="nav-link" onclick="showPage('menu')">Меню</span>
+                <span class="nav-link" onclick="showPage('contacts')">Контакти</span>
+            </nav>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <div id="auth-section"><span class="nav-link" onclick="openAuthModal('login')">Увійти</span></div>
+                <button class="cart-btn" onclick="openCart()">🛒 Кошик <span class="cart-count" id="cart-count">0</span></button>
+            </div>
+        </div>
+    </header>
+
+    <div id="home-page" class="page active">
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Найсмачніші суші у місті</h1>
+                <p>Свіжі інгредієнти, автентичні рецепти та швидка доставка</p>
+                <button class="hero-btn" onclick="showPage('menu')">Замовити зараз</button>
+            </div>
+        </section>
+        <div class="main-container">
+            <section class="categories-section">
+                <h2 class="section-title">Категорії</h2>
+                <div class="categories-grid" id="categories-grid"></div>
+            </section>
+            <section class="products-section">
+                <h2 class="section-title">Популярні страви</h2>
+                <div class="products-grid" id="popular-grid"></div>
+            </section>
+        </div>
+    </div>
+
+    <div id="menu-page" class="page">
+        <div class="main-container">
+            <section class="categories-section">
+                <h2 class="section-title">Категорії</h2>
+                <div class="categories-grid" id="menu-categories-grid"></div>
+            </section>
+            <section class="products-section">
+                <h2 class="section-title" id="category-title">Всі страви</h2>
+                <div class="products-grid" id="products-grid"></div>
+            </section>
+        </div>
+    </div>
+
+    <div id="contacts-page" class="page">
+        <div class="main-container">
+            <section class="profile-section">
+                <h2 class="section-title">Контакти</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-top: 2rem;">
+                    <div><h3>📍 Адреса</h3><p>м. Київ, вул. Хрещатик, 1</p></div>
+                    <div><h3>📞 Телефон</h3><p>+380 (99) 123-45-67</p></div>
+                    <div><h3>🕐 Графік роботи</h3><p>Пн-Нд: 10:00 - 22:00</p></div>
+                    <div><h3>📧 Email</h3><p>info@sushijaroll.ua</p></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div id="profile-page" class="page">
+        <div class="main-container">
+            <section class="profile-section">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profile-avatar">U</div>
+                    <div class="profile-info">
+                        <h2 id="profile-name">Користувач</h2>
+                        <p id="profile-email">email@example.com</p>
+                    </div>
+                </div>
+            </section>
+            <section class="profile-section">
+                <h2 style="margin-bottom: 1.5rem;">Мої замовлення</h2>
+                <div class="orders-list" id="orders-list"><p style="text-align: center; color: var(--gray-600);">У вас поки немає замовлень</p></div>
+            </section>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closeAll()"></div>
+    <aside class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header"><h2>Кошик</h2><button class="close-cart" onclick="closeCart()">✕</button></div>
+        <div class="cart-items" id="cart-items"><div class="cart-empty"><div class="cart-empty-icon">🛒</div><p>Кошик порожній</p></div></div>
+        <div class="cart-footer">
+            <div class="cart-total"><span>Разом:</span><span id="cart-total">0 ₴</span></div>
+            <button class="checkout-btn" onclick="checkout()">Оформити замовлення</button>
+        </div>
+    </aside>
+
+    <div class="modal" id="auth-modal">
+        <button class="close-modal" onclick="closeAuthModal()">✕</button>
+        <h2 id="auth-title">Вхід</h2>
+        <form id="auth-form" onsubmit="handleAuth(event)">
+            <div class="form-group" id="name-group" style="display: none;"><label>Ім'я</label><input type="text" id="auth-name" placeholder="Ваше ім'я"></div>
+            <div class="form-group"><label>Email</label><input type="email" id="auth-email" placeholder="your@email.com" required></div>
+            <div class="form-group"><label>Пароль</label><input type="password" id="auth-password" placeholder="••••••••" required></div>
+            <button type="submit" class="submit-btn" id="auth-submit">Увійти</button>
+        </form>
+        <p class="auth-switch"><span id="auth-switch-text">Немає акаунту?</span> <a onclick="toggleAuthMode()"><span id="auth-switch-link">Зареєструватися</span></a></p>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section"><h3>SushijaRoll</h3><p>Найсмачніші суші та роли у місті</p></div>
+            <div class="footer-section"><h3>Меню</h3><a href="#" onclick="filterByCategory('rolls')">Роли</a><a href="#" onclick="filterByCategory('sushi')">Суші</a><a href="#" onclick="filterByCategory('gunkan')">Гункани</a></div>
+            <div class="footer-section"><h3>Контакти</h3><p>+380 (99) 123-45-67</p><p>info@sushijaroll.ua</p></div>
+            <div class="footer-section"><h3>Графік роботи</h3><p>Пн-Нд: 10:00 - 22:00</p></div>
+        </div>
+        <div class="footer-bottom"><p>© 2024 SushijaRoll. Всі права захищені.</p></div>
+    </footer>
+    <script>
+        const CATEGORIES = [
+            {id: "rolls", name: "Роли", image_url: "https://images.unsplash.com/photo-1648141294171-de1980517238?crop=entropy&cs=srgb&fm=jpg&q=85"},
+            {id: "sushi", name: "Суші", image_url: "https://images.unsplash.com/photo-1680675228874-9b9963812b7c?crop=entropy&cs=srgb&fm=jpg&q=85"},
+            {id: "gunkan", name: "Гункани", image_url: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?crop=entropy&cs=srgb&fm=jpg&q=85"},
+            {id: "baked", name: "Запечені", image_url: "https://images.unsplash.com/photo-1727662672146-5ee60087e661?crop=entropy&cs=srgb&fm=jpg&q=85"},
+            {id: "soup", name: "Супи", image_url: "https://images.unsplash.com/photo-1680137248903-7af5d51a3350?crop=entropy&cs=srgb&fm=jpg&q=85"},
+            {id: "burgers", name: "Бургери", image_url: "https://images.unsplash.com/photo-1633821773816-0d50391e7b1a?crop=entropy&cs=srgb&fm=jpg&q=85"},
+            {id: "hotdogs", name: "Хот-доги", image_url: "https://images.unsplash.com/photo-1612392166886-ee8475b03571?crop=entropy&cs=srgb&fm=jpg&q=85"},
+            {id: "drinks", name: "Напої", image_url: "https://images.unsplash.com/photo-1665199254146-55199071b40d?crop=entropy&cs=srgb&fm=jpg&q=85"}
+        ];
+
+        const ROLL_IMAGES = [
+            "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?crop=entropy&cs=srgb&fm=jpg&q=85",
+            "https://images.unsplash.com/photo-1611143669185-af224c5e3252?crop=entropy&cs=srgb&fm=jpg&q=85",
+            "https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?crop=entropy&cs=srgb&fm=jpg&q=85",
+            "https://images.unsplash.com/photo-1553621042-f6e147245754?crop=entropy&cs=srgb&fm=jpg&q=85",
+            "https://images.unsplash.com/photo-1540648639573-8c848de23f0a?crop=entropy&cs=srgb&fm=jpg&q=85",
+            "https://images.unsplash.com/photo-1559410545-0bdcd187e0a6?crop=entropy&cs=srgb&fm=jpg&q=85",
+            "https://images.unsplash.com/photo-1580822184713-fc5400e7fe10?crop=entropy&cs=srgb&fm=jpg&q=85",
+            "https://images.unsplash.com/photo-1617196034183-421b4917c92d?crop=entropy&cs=srgb&fm=jpg&q=85"
+        ];
+
+        const SUSHI_IMAGES = [
+            "https://images.unsplash.com/photo-1680675228874-9b9963812b7c?crop=entropy&cs=srgb&fm=jpg&q=85",
+            "https://images.unsplash.com/photo-1691442574585-010aea07f722?crop=entropy&cs=srgb&fm=jpg&q=85",
+            "https://images.unsplash.com/photo-1691442574552-6059a11c0e25?crop=entropy&cs=srgb&fm=jpg&q=85",
+            "https://images.unsplash.com/photo-1534482421-64566f976cfa?crop=entropy&cs=srgb&fm=jpg&q=85"
+        ];
+
+        const BAKED_IMAGES = [
+            "https://images.unsplash.com/photo-1727662672146-5ee60087e661?crop=entropy&cs=srgb&fm=jpg&q=85",
+            "https://images.unsplash.com/photo-1696091811927-6b9552931f70?crop=entropy&cs=srgb&fm=jpg&q=85",
+            "https://images.unsplash.com/photo-1648141294171-de1980517238?crop=entropy&cs=srgb&fm=jpg&q=85"
+        ];
+
+        const SOUP_IMAGES = [
+            "https://images.unsplash.com/photo-1637024696628-02cb19cc1829?crop=entropy&cs=srgb&fm=jpg&q=85",
+            "https://images.unsplash.com/photo-1680137248903-7af5d51a3350?crop=entropy&cs=srgb&fm=jpg&q=85"
+        ];
+
+        const PRODUCTS = [
+            // РОЛИ (47 позицій)
+            {id: "1", name: "Філадельфія", description: "Лосось, крем-сир, огірок, авокадо", price: 149, weight: 260, category: "rolls", image_url: ROLL_IMAGES[0], is_popular: true},
+            {id: "2", name: "Філадельфія LITE", description: "Лосось, крем-сир, огірок", price: 108, weight: 220, category: "rolls", image_url: ROLL_IMAGES[1]},
+            {id: "3", name: "Філадельфія Масаго", description: "Лосось, крем-сир, масаго", price: 170, weight: 280, category: "rolls", image_url: ROLL_IMAGES[2], is_popular: true},
+            {id: "4", name: "Філадельфія Бланш", description: "Лосось, крем-сир, авокадо, кунжут", price: 112, weight: 250, category: "rolls", image_url: ROLL_IMAGES[3]},
+            {id: "5", name: "Філадельфія вугор", description: "Вугор, крем-сир, авокадо", price: 174, weight: 270, category: "rolls", image_url: ROLL_IMAGES[4]},
+            {id: "6", name: "Філа копчена", description: "Копчений лосось, крем-сир", price: 187, weight: 260, category: "rolls", image_url: ROLL_IMAGES[5]},
+            {id: "7", name: "Аляска краб LITE", description: "Сніжний краб, авокадо, огірок", price: 107, weight: 230, category: "rolls", image_url: ROLL_IMAGES[6]},
+            {id: "8", name: "Каліфорнія краб", description: "Сніжний краб, авокадо, огірок, тобіко", price: 127, weight: 240, category: "rolls", image_url: ROLL_IMAGES[7]},
+            {id: "9", name: "Золотий дракон", description: "Вугор, креветка темпура, авокадо, унагі соус", price: 189, weight: 290, category: "rolls", image_url: ROLL_IMAGES[0], is_popular: true},
+            {id: "10", name: "Оріон", description: "Лосось, вугор, авокадо, спайсі соус", price: 109, weight: 250, category: "rolls", image_url: ROLL_IMAGES[1]},
+            {id: "11", name: "Голді", description: "Креветка темпура, лосось, манго соус", price: 80, weight: 220, category: "rolls", image_url: ROLL_IMAGES[2]},
+            {id: "12", name: "Крейзі", description: "Креветка темпура, лосось, вугор, ікра", price: 111, weight: 280, category: "rolls", image_url: ROLL_IMAGES[3]},
+            {id: "13", name: "Темпо", description: "Креветка темпура, огірок, спайсі соус", price: 110, weight: 240, category: "rolls", image_url: ROLL_IMAGES[4]},
+            {id: "14", name: "Клайд", description: "Лосось, огірок, авокадо, соус", price: 106, weight: 230, category: "rolls", image_url: ROLL_IMAGES[5]},
+            {id: "15", name: "Фенікс", description: "Вугор, авокадо, огірок, унагі", price: 114, weight: 250, category: "rolls", image_url: ROLL_IMAGES[6]},
+            {id: "16", name: "Ескімо", description: "Лосось, крем-сир, ікра, кунжут", price: 113, weight: 260, category: "rolls", image_url: ROLL_IMAGES[7]},
+            {id: "17", name: "Терра", description: "Тунець, авокадо, спайсі соус", price: 115, weight: 240, category: "rolls", image_url: ROLL_IMAGES[0]},
+            {id: "18", name: "Прометей", description: "Лосось, вугор, ікра масаго", price: 108, weight: 270, category: "rolls", image_url: ROLL_IMAGES[1]},
+            {id: "19", name: "Кракен", description: "Восьминіг, авокадо, спайсі соус", price: 109, weight: 250, category: "rolls", image_url: ROLL_IMAGES[2]},
+            {id: "20", name: "Джері-Чіз", description: "Лосось, крем-сир, сирний соус", price: 110, weight: 260, category: "rolls", image_url: ROLL_IMAGES[3]},
+            {id: "21", name: "Тері-Кері", description: "Курка теріякі, авокадо, огірок", price: 111, weight: 250, category: "rolls", image_url: ROLL_IMAGES[4]},
+            {id: "22", name: "Фаренгейт", description: "Лосось, тунець, гострий соус", price: 112, weight: 260, category: "rolls", image_url: ROLL_IMAGES[5]},
+            {id: "23", name: "Ебі-Голд", description: "Креветка, авокадо, ікра тобіко", price: 113, weight: 250, category: "rolls", image_url: ROLL_IMAGES[6]},
+            {id: "24", name: "Мароко", description: "Лосось, манго, крем-сир", price: 106, weight: 260, category: "rolls", image_url: ROLL_IMAGES[7]},
+            {id: "25", name: "Єлоу", description: "Тунець, манго, авокадо", price: 114, weight: 250, category: "rolls", image_url: ROLL_IMAGES[0]},
+            {id: "26", name: "Кері-Манго", description: "Креветка, манго, соус каррі", price: 108, weight: 250, category: "rolls", image_url: ROLL_IMAGES[1]},
+            {id: "27", name: "Роялті", description: "Лосось, вугор, ікра, авокадо", price: 110, weight: 280, category: "rolls", image_url: ROLL_IMAGES[2]},
+            {id: "28", name: "Химера", description: "Тунець, лосось, вугор, спайсі", price: 111, weight: 290, category: "rolls", image_url: ROLL_IMAGES[3]},
+            {id: "29", name: "Ренесанс", description: "Креветка темпура, лосось, авокадо", price: 112, weight: 270, category: "rolls", image_url: ROLL_IMAGES[4]},
+            {id: "30", name: "Сайгон", description: "Креветка, манго, рисовий папір", price: 142, weight: 250, category: "rolls", image_url: ROLL_IMAGES[5]},
+            {id: "31", name: "Болгарія", description: "Лосось, болгарський перець, крем-сир", price: 209, weight: 280, category: "rolls", image_url: ROLL_IMAGES[6]},
+            {id: "32", name: "Чіз Бланш", description: "Лосось, подвійний сир, соус", price: 143, weight: 270, category: "rolls", image_url: ROLL_IMAGES[7]},
+            {id: "33", name: "Сирний", description: "Лосось, три види сиру", price: 209, weight: 280, category: "rolls", image_url: ROLL_IMAGES[0]},
+            {id: "34", name: "Епл", description: "Лосось, яблуко, крем-сир", price: 173, weight: 260, category: "rolls", image_url: ROLL_IMAGES[1]},
+            {id: "35", name: "Буніто тунець", description: "Тунець, крем-сир, стружка тунця", price: 178, weight: 280, category: "rolls", image_url: ROLL_IMAGES[2], is_popular: true},
+            {id: "36", name: "Буніто копчений", description: "Копчений лосось, стружка тунця", price: 118, weight: 260, category: "rolls", image_url: ROLL_IMAGES[3]},
+            {id: "37", name: "Буніто сирний", description: "Крем-сир, стружка тунця, соус", price: 111, weight: 250, category: "rolls", image_url: ROLL_IMAGES[4]},
+            {id: "38", name: "Крабі", description: "Сніжний краб, авокадо, ікра", price: 181, weight: 260, category: "rolls", image_url: ROLL_IMAGES[5]},
+            {id: "39", name: "Скімо", description: "Креветка, лосось, ікра масаго", price: 122, weight: 270, category: "rolls", image_url: ROLL_IMAGES[6]},
+            {id: "40", name: "Осака", description: "Вугор, авокадо, унагі соус", price: 182, weight: 280, category: "rolls", image_url: ROLL_IMAGES[7]},
+            {id: "41", name: "Джек", description: "Лосось, огірок, кунжут", price: 114, weight: 240, category: "rolls", image_url: ROLL_IMAGES[0]},
+            {id: "42", name: "Вега", description: "Авокадо, огірок, манго (веган)", price: 108, weight: 230, category: "rolls", image_url: ROLL_IMAGES[1]},
+            {id: "43", name: "Лейзі", description: "Лосось, авокадо, легкий соус", price: 109, weight: 250, category: "rolls", image_url: ROLL_IMAGES[2]},
+            {id: "44", name: "Норді", description: "Лосось, крем-сир, норі зовні", price: 110, weight: 260, category: "rolls", image_url: ROLL_IMAGES[3]},
+            {id: "45", name: "Сато", description: "Тунець, лосось, крем-сир", price: 111, weight: 270, category: "rolls", image_url: ROLL_IMAGES[4]},
+            {id: "46", name: "Хаос", description: "Креветка темпура, лосось, вугор, ікра", price: 217, weight: 320, category: "rolls", image_url: ROLL_IMAGES[5]},
+            {id: "47", name: "Рейнбоу люкс", description: "Лосось, тунець, вугор, креветка", price: 199, weight: 310, category: "rolls", image_url: ROLL_IMAGES[6]},
+
+            // СУШІ (13 позицій)
+            {id: "48", name: "Суші з лососем", description: "Ніжне філе лосося на рисі", price: 55, weight: 40, category: "sushi", image_url: SUSHI_IMAGES[0]},
+            {id: "49", name: "Суші з тунцем", description: "Свіжий тунець на рисі", price: 65, weight: 40, category: "sushi", image_url: SUSHI_IMAGES[1]},
+            {id: "50", name: "Суші з вугрем", description: "Копчений вугор з унагі соусом", price: 75, weight: 45, category: "sushi", image_url: SUSHI_IMAGES[2], is_popular: true},
+            {id: "51", name: "Суші з креветкою", description: "Тигрова креветка на рисі", price: 60, weight: 40, category: "sushi", image_url: SUSHI_IMAGES[3]},
+            {id: "52", name: "Суші з крабом", description: "Сніжний краб на рисі", price: 70, weight: 45, category: "sushi", image_url: SUSHI_IMAGES[0]},
+            {id: "53", name: "Суші з тамаго", description: "Японський омлет на рисі", price: 45, weight: 40, category: "sushi", image_url: SUSHI_IMAGES[1]},
+            {id: "54", name: "Суші з огірком", description: "Свіжий огірок у норі", price: 35, weight: 35, category: "sushi", image_url: SUSHI_IMAGES[2]},
+            {id: "55", name: "Суші з авокадо", description: "Авокадо на рисі", price: 40, weight: 40, category: "sushi", image_url: SUSHI_IMAGES[3]},
+            {id: "56", name: "Суші з копченим лососем", description: "Копчений лосось на рисі", price: 65, weight: 40, category: "sushi", image_url: SUSHI_IMAGES[0]},
+            {id: "57", name: "Суші з креветкою темпура", description: "Креветка темпура на рисі", price: 70, weight: 45, category: "sushi", image_url: SUSHI_IMAGES[1]},
+            {id: "58", name: "Суші Ебі", description: "Варена креветка на рисі", price: 55, weight: 40, category: "sushi", image_url: SUSHI_IMAGES[2]},
+            {id: "59", name: "Суші Сі-ФуТ", description: "Мікс морепродуктів на рисі", price: 60, weight: 45, category: "sushi", image_url: SUSHI_IMAGES[3]},
+            {id: "60", name: "Лосось слабосолений", description: "Слабосолений лосось на рисі", price: 60, weight: 40, category: "sushi", image_url: SUSHI_IMAGES[0]},
+
+            // ГУНКАНИ (11 позицій)
+            {id: "61", name: "Гункан з креветкою", description: "Креветка в спайсі соусі", price: 75, weight: 45, category: "gunkan", image_url: ROLL_IMAGES[0]},
+            {id: "62", name: "Гункан чука", description: "Салат чука з кунжутом", price: 75, weight: 40, category: "gunkan", image_url: ROLL_IMAGES[1]},
+            {id: "63", name: "Гункан твін", description: "Лосось та тунець", price: 75, weight: 45, category: "gunkan", image_url: ROLL_IMAGES[2]},
+            {id: "64", name: "Гункан кері", description: "Креветка в соусі каррі", price: 75, weight: 45, category: "gunkan", image_url: ROLL_IMAGES[3]},
+            {id: "65", name: "Спайсі лосось", description: "Лосось в спайсі соусі", price: 75, weight: 45, category: "gunkan", image_url: ROLL_IMAGES[4], is_popular: true},
+            {id: "66", name: "Спайсі тунець", description: "Тунець в гострому соусі", price: 75, weight: 45, category: "gunkan", image_url: ROLL_IMAGES[5]},
+            {id: "67", name: "Спайсі креветка", description: "Креветка в гострому соусі", price: 75, weight: 45, category: "gunkan", image_url: ROLL_IMAGES[6]},
+            {id: "68", name: "Спайсі вугор", description: "Вугор в спайсі соусі", price: 75, weight: 45, category: "gunkan", image_url: ROLL_IMAGES[7]},
+            {id: "69", name: "Спайсі восьминіг", description: "Восьминіг в гострому соусі", price: 75, weight: 45, category: "gunkan", image_url: ROLL_IMAGES[0]},
+            {id: "70", name: "Міро", description: "Мікс морепродуктів, спайсі", price: 75, weight: 45, category: "gunkan", image_url: ROLL_IMAGES[1]},
+            {id: "97", name: "Бейбі восьминіг", description: "Маленькі восьминоги в соусі", price: 194, weight: 200, category: "gunkan", image_url: ROLL_IMAGES[2]},
+
+            // ЗАПЕЧЕНІ (10 позицій)
+            {id: "71", name: "Запечений лосось делюкс", description: "Лосось під сирним соусом", price: 195, weight: 280, category: "baked", image_url: BAKED_IMAGES[0], is_popular: true},
+            {id: "72", name: "Запечений краб", description: "Сніжний краб під спайсі соусом", price: 199, weight: 260, category: "baked", image_url: BAKED_IMAGES[1]},
+            {id: "73", name: "Запечена креветка", description: "Креветка темпура з сиром", price: 125, weight: 250, category: "baked", image_url: BAKED_IMAGES[2]},
+            {id: "74", name: "Запечений сніжний краб", description: "Сніжний краб під соусом", price: 100, weight: 240, category: "baked", image_url: BAKED_IMAGES[0]},
+            {id: "75", name: "Запечений лосось креветка", description: "Лосось та креветка під сиром", price: 102, weight: 260, category: "baked", image_url: BAKED_IMAGES[1]},
+            {id: "76", name: "Вулкан вугор", description: "Вугор з гострим соусом", price: 191, weight: 290, category: "baked", image_url: BAKED_IMAGES[2]},
+            {id: "77", name: "Вулкан лосось", description: "Лосось з гострим соусом", price: 194, weight: 280, category: "baked", image_url: BAKED_IMAGES[0]},
+            {id: "78", name: "Евріка", description: "Мікс морепродуктів запечених", price: 172, weight: 270, category: "baked", image_url: BAKED_IMAGES[1]},
+            {id: "79", name: "Джентлі", description: "Лосось під ніжним соусом", price: 172, weight: 260, category: "baked", image_url: BAKED_IMAGES[2]},
+            {id: "80", name: "Буніто Бейк", description: "Запечений рол зі стружкою тунця", price: 184, weight: 270, category: "baked", image_url: BAKED_IMAGES[0]},
+
+            // СУПИ (6 позицій)
+            {id: "81", name: "Місо класік", description: "Традиційний місо суп з тофу та вакаме", price: 81, weight: 300, category: "soup", image_url: SOUP_IMAGES[0]},
+            {id: "82", name: "Місо грибний", description: "Місо з грибами шиітаке", price: 87, weight: 320, category: "soup", image_url: SOUP_IMAGES[1]},
+            {id: "83", name: "Місо вугор", description: "Місо з копченим вугрем", price: 115, weight: 350, category: "soup", image_url: SOUP_IMAGES[0], is_popular: true},
+            {id: "84", name: "Місо лосось", description: "Місо з шматочками лосося", price: 85, weight: 330, category: "soup", image_url: SOUP_IMAGES[1]},
+            {id: "85", name: "Місо креветка", description: "Місо з тигровими креветками", price: 116, weight: 340, category: "soup", image_url: SOUP_IMAGES[0]},
+            {id: "86", name: "Вакаме", description: "Легкий суп з водоростями вакаме", price: 89, weight: 300, category: "soup", image_url: SOUP_IMAGES[1]},
+
+            // БУРГЕРИ (3 позиції)
+            {id: "87", name: "Вугор бургер", description: "Бургер з копченим вугрем та унагі соусом", price: 149, weight: 280, category: "burgers", image_url: "https://images.unsplash.com/photo-1633821773816-0d50391e7b1a?crop=entropy&cs=srgb&fm=jpg&q=85", is_popular: true},
+            {id: "88", name: "Лосось бургер", description: "Бургер з лососем та спайсі соусом", price: 139, weight: 270, category: "burgers", image_url: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?crop=entropy&cs=srgb&fm=jpg&q=85"},
+            {id: "89", name: "Креветка бургер", description: "Бургер з креветкою темпура", price: 145, weight: 260, category: "burgers", image_url: "https://images.unsplash.com/photo-1550317138-10000687a72b?crop=entropy&cs=srgb&fm=jpg&q=85"},
+
+            // ХОТ-ДОГИ (3 позиції)
+            {id: "90", name: "Хот-дог класік", description: "Японський хот-дог з лососем", price: 95, weight: 200, category: "hotdogs", image_url: "https://images.unsplash.com/photo-1612392166886-ee8475b03571?crop=entropy&cs=srgb&fm=jpg&q=85"},
+            {id: "91", name: "Хот-дог з вугрем", description: "Хот-дог з копченим вугрем", price: 105, weight: 210, category: "hotdogs", image_url: "https://images.unsplash.com/photo-1612392166886-ee8475b03571?crop=entropy&cs=srgb&fm=jpg&q=85"},
+            {id: "92", name: "Хот-дог з креветкою", description: "Хот-дог з креветкою темпура", price: 99, weight: 200, category: "hotdogs", image_url: "https://images.unsplash.com/photo-1612392166886-ee8475b03571?crop=entropy&cs=srgb&fm=jpg&q=85"},
+
+            // НАПОЇ (4 позиції)
+            {id: "93", name: "Матча латте", description: "Японський зелений чай з молоком", price: 79, weight: 350, category: "drinks", image_url: "https://images.unsplash.com/photo-1665199254146-55199071b40d?crop=entropy&cs=srgb&fm=jpg&q=85"},
+            {id: "94", name: "Саке", description: "Традиційне японське рисове вино", price: 129, weight: 180, category: "drinks", image_url: "https://images.unsplash.com/photo-1529042410759-befb1204b468?crop=entropy&cs=srgb&fm=jpg&q=85"},
+            {id: "95", name: "Рамуне", description: "Японська газована вода", price: 59, weight: 200, category: "drinks", image_url: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?crop=entropy&cs=srgb&fm=jpg&q=85"},
+            {id: "96", name: "Зелений чай", description: "Класичний японський зелений чай", price: 49, weight: 300, category: "drinks", image_url: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?crop=entropy&cs=srgb&fm=jpg&q=85"}
+        ];
+
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let user = JSON.parse(localStorage.getItem('user')) || null;
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+        let currentCategory = null;
+        let isLoginMode = true;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCategories();
+            renderPopularProducts();
+            renderMenuCategories();
+            renderProducts();
+            updateCartCount();
+            updateAuthSection();
+        });
+
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(page + '-page').classList.add('active');
+            if (page === 'menu') { currentCategory = null; document.getElementById('category-title').textContent = 'Всі страви'; renderProducts(); }
+            if (page === 'profile') { if (!user) { openAuthModal('login'); return; } renderProfile(); }
+            window.scrollTo(0, 0);
+        }
+
+        function renderCategories() {
+            document.getElementById('categories-grid').innerHTML = CATEGORIES.map(cat => `<div class="category-card" onclick="filterByCategory('${cat.id}')"><img src="${cat.image_url}" alt="${cat.name}" class="category-img"><div class="category-name">${cat.name}</div></div>`).join('');
+        }
+
+        function renderMenuCategories() {
+            document.getElementById('menu-categories-grid').innerHTML = `<div class="category-card ${!currentCategory ? 'active' : ''}" onclick="filterByCategory(null)"><img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?crop=entropy&cs=srgb&fm=jpg&q=85" alt="Всі" class="category-img"><div class="category-name">Всі</div></div>` + CATEGORIES.map(cat => `<div class="category-card ${currentCategory === cat.id ? 'active' : ''}" onclick="filterByCategory('${cat.id}')"><img src="${cat.image_url}" alt="${cat.name}" class="category-img"><div class="category-name">${cat.name}</div></div>`).join('');
+        }
+
+        function filterByCategory(categoryId) {
+            currentCategory = categoryId;
+            showPage('menu');
+            const category = CATEGORIES.find(c => c.id === categoryId);
+            document.getElementById('category-title').textContent = category ? category.name : 'Всі страви';
+            renderMenuCategories();
+            renderProducts();
+        }
+
+        function renderPopularProducts() {
+            document.getElementById('popular-grid').innerHTML = PRODUCTS.filter(p => p.is_popular).map(p => createProductCard(p)).join('');
+        }
+
+        function renderProducts() {
+            let products = currentCategory ? PRODUCTS.filter(p => p.category === currentCategory) : PRODUCTS;
+            document.getElementById('products-grid').innerHTML = products.map(p => createProductCard(p)).join('');
+        }
+
+        function createProductCard(product) {
+            return `<div class="product-card-wrapper">${product.is_popular ? '<span class="popular-badge">Хіт</span>' : ''}<div class="product-card"><img src="${product.image_url}" alt="${product.name}" class="product-img"><div class="product-info"><h3 class="product-name">${product.name}</h3><p class="product-desc">${product.description || ''}</p><div class="product-meta"><div><span class="product-price">${product.price} ₴</span><span class="product-weight">${product.weight} г</span></div><button class="add-btn" onclick="addToCart('${product.id}')">+</button></div></div></div></div>`;
+        }
+
+        function addToCart(productId) {
+            const product = PRODUCTS.find(p => p.id === productId);
+            if (!product) return;
+            const existingItem = cart.find(item => item.id === productId);
+            if (existingItem) { existingItem.qty++; } else { cart.push({ id: product.id, name: product.name, price: product.price, image_url: product.image_url, qty: 1 }); }
+            saveCart(); updateCartCount(); showToast('Додано до кошика');
+        }
+
+        function updateQuantity(productId, delta) {
+            const item = cart.find(i => i.id === productId);
+            if (!item) return;
+            item.qty += delta;
+            if (item.qty <= 0) { cart = cart.filter(i => i.id !== productId); }
+            saveCart(); renderCart(); updateCartCount();
+        }
+
+        function removeFromCart(productId) { cart = cart.filter(i => i.id !== productId); saveCart(); renderCart(); updateCartCount(); }
+        function saveCart() { localStorage.setItem('cart', JSON.stringify(cart)); }
+        function updateCartCount() { document.getElementById('cart-count').textContent = cart.reduce((sum, item) => sum + item.qty, 0); }
+        function openCart() { document.getElementById('cart-sidebar').classList.add('open'); document.getElementById('overlay').classList.add('visible'); renderCart(); }
+        function closeCart() { document.getElementById('cart-sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('visible'); }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items');
+            const totalEl = document.getElementById('cart-total');
+            if (cart.length === 0) { container.innerHTML = `<div class="cart-empty"><div class="cart-empty-icon">🛒</div><p>Кошик порожній</p></div>`; totalEl.textContent = '0 ₴'; return; }
+            const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+            container.innerHTML = cart.map(item => `<div class="cart-item"><img src="${item.image_url}" alt="${item.name}" class="cart-item-img"><div class="cart-item-info"><div class="cart-item-name">${item.name}</div><div class="cart-item-price">${item.price} ₴</div><div class="quantity-controls"><button class="qty-btn" onclick="updateQuantity('${item.id}', -1)">−</button><span>${item.qty}</span><button class="qty-btn" onclick="updateQuantity('${item.id}', 1)">+</button></div></div><button class="remove-btn" onclick="removeFromCart('${item.id}')">✕</button></div>`).join('');
+            totalEl.textContent = total.toFixed(2) + ' ₴';
+        }
+
+        function checkout() {
+            if (cart.length === 0) { showToast('Кошик порожній', true); return; }
+            if (!user) { closeCart(); openAuthModal('login'); showToast('Увійдіть для оформлення замовлення', true); return; }
+            const order = { id: 'ORD-' + Date.now(), items: [...cart], total: cart.reduce((sum, item) => sum + item.price * item.qty, 0), date: new Date().toLocaleDateString('uk-UA'), status: 'pending' };
+            orders.push(order); localStorage.setItem('orders', JSON.stringify(orders));
+            cart = []; saveCart(); updateCartCount(); closeCart(); showToast('Замовлення оформлено!'); showPage('profile');
+        }
+
+        function openAuthModal(mode) { isLoginMode = mode === 'login'; updateAuthModal(); document.getElementById('auth-modal').classList.add('open'); document.getElementById('overlay').classList.add('visible'); }
+        function closeAuthModal() { document.getElementById('auth-modal').classList.remove('open'); document.getElementById('overlay').classList.remove('visible'); }
+        function toggleAuthMode() { isLoginMode = !isLoginMode; updateAuthModal(); }
+        function updateAuthModal() {
+            document.getElementById('auth-title').textContent = isLoginMode ? 'Вхід' : 'Реєстрація';
+            document.getElementById('auth-submit').textContent = isLoginMode ? 'Увійти' : 'Зареєструватися';
+            document.getElementById('name-group').style.display = isLoginMode ? 'none' : 'block';
+            document.getElementById('auth-switch-text').textContent = isLoginMode ? 'Немає акаунту?' : 'Вже є акаунт?';
+            document.getElementById('auth-switch-link').textContent = isLoginMode ? 'Зареєструватися' : 'Увійти';
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const name = document.getElementById('auth-name').value;
+            if (!isLoginMode && !name) { showToast("Введіть ім'я", true); return; }
+            user = { name: isLoginMode ? email.split('@')[0] : name, email: email };
+            localStorage.setItem('user', JSON.stringify(user)); updateAuthSection(); closeAuthModal();
+            showToast(isLoginMode ? 'Вхід успішний!' : 'Реєстрація успішна!');
+            document.getElementById('auth-form').reset();
+        }
+
+        function updateAuthSection() {
+            const authSection = document.getElementById('auth-section');
+            if (user) { authSection.innerHTML = `<div class="user-menu"><button class="user-btn" onclick="toggleUserDropdown()">👤 ${user.name}</button><div class="user-dropdown" id="user-dropdown"><span class="dropdown-item" onclick="showPage('profile'); closeUserDropdown();">Мій профіль</span><span class="dropdown-item logout" onclick="logout()">Вийти</span></div></div>`; }
+            else { authSection.innerHTML = `<span class="nav-link" onclick="openAuthModal('login')">Увійти</span>`; }
+        }
+
+        function toggleUserDropdown() { document.getElementById('user-dropdown').classList.toggle('open'); }
+        function closeUserDropdown() { const d = document.getElementById('user-dropdown'); if (d) d.classList.remove('open'); }
+        function logout() { user = null; localStorage.removeItem('user'); updateAuthSection(); showPage('home'); showToast('Ви вийшли з акаунту'); }
+
+        function renderProfile() {
+            if (!user) return;
+            document.getElementById('profile-avatar').textContent = user.name.charAt(0).toUpperCase();
+            document.getElementById('profile-name').textContent = user.name;
+            document.getElementById('profile-email').textContent = user.email;
+            const ordersList = document.getElementById('orders-list');
+            if (orders.length === 0) { ordersList.innerHTML = '<p style="text-align: center; color: var(--gray-600);">У вас поки немає замовлень</p>'; return; }
+            ordersList.innerHTML = orders.map(order => `<div class="order-card"><div class="order-header"><span class="order-id">${order.id}</span><span class="order-status ${order.status}">${order.status === 'pending' ? 'В обробці' : 'Підтверджено'}</span></div><div class="order-items">${order.items.map(item => `<div class="order-item-row"><span>${item.name} × ${item.qty}</span><span>${(item.price * item.qty).toFixed(2)} ₴</span></div>`).join('')}</div><div class="order-total"><span>Разом:</span><span>${order.total.toFixed(2)} ₴</span></div><p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--gray-600);">${order.date}</p></div>`).join('');
+        }
+
+        function closeAll() { closeCart(); closeAuthModal(); closeUserDropdown(); }
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show' + (isError ? ' error' : '');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+        document.addEventListener('click', (e) => { if (!e.target.closest('.user-menu')) { closeUserDropdown(); } });
+    </script>
+</body>
+</html>
